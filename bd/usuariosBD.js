@@ -65,11 +65,42 @@ async function borrarUsuario(id){
     return usuarioBorrado;
 }
 
+// FUNCIÓN PARA EDITAR
+async function editarUsuario(id, data) {
+    const usuarioExistente = await buscarPorID(id); // Verifica si el usuario existe
+    if (!usuarioExistente) {
+        return false; // Retorna falso si el usuario no existe
+    }
+
+    // Si existe y se proporciona una nueva contraseña, encriptarla
+    if (data.password) {
+        const { salt, hash } = encriptarPassword(data.password);
+        data.password = hash;
+        data.salt = salt;
+    } else {
+        // Si no se proporciona una nueva contraseña, usa la existente
+        data.password = usuarioExistente.password;
+        data.salt = usuarioExistente.salt;
+    }
+
+    const usuarioActualizado = {
+        nombre: data.nombre || usuarioExistente.nombre,
+        usuario: data.usuario || usuarioExistente.usuario,
+        password: data.password,
+        salt: data.salt,
+        tipoUsuario: data.tipoUsuario || usuarioExistente.tipoUsuario
+    };
+
+    await usuariosBD.doc(id).update(usuarioActualizado); // Actualiza los datos en la BD
+    return usuarioActualizado;
+}
+
 
 module.exports={
     mostrarUsuarios,
     nuevoUsuario,
     borrarUsuario,
     buscarPorID,
-}
+    editarUsuario,
+};
 

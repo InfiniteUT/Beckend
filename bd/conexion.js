@@ -12,5 +12,5 @@ const ventas = proyecto.collection("ventas");
 module.exports = {
     usuarios,
     productos,
-    ventas // Agregar la colección de ventas
+    ventas 
 };

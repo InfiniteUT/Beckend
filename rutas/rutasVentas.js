@@ -1,5 +1,5 @@
 var rutas = require("express").Router();
-var { nuevaVenta, buscarVentaPorId, mostrarVentas, cambiarEstatusVenta } = require("../bd/ventasBD");
+var { nuevaVenta, buscarVentaPorId, mostrarVentas, cambiarEstatusVenta, editarVenta } = require("../bd/ventasBD");
 
 rutas.get("/", async (req, res) => {
     const ventasValidas = await mostrarVentas();
@@ -24,5 +24,15 @@ rutas.put("/cancelarVenta/:id", async (req, res) => {
     const ventaCancelada = await cambiarEstatusVenta(req.params.id, "cancelado");
     res.json(ventaCancelada);
 });
+
+rutas.put("/editarVenta/:id", async (req, res) => {
+    const ventaActualizada = await editarVenta(req.params.id, req.body);
+    if (ventaActualizada) {
+        res.json(ventaActualizada); // Si se actualiza correctamente, devolver la venta actualizada
+    } else {
+        res.status(404).json({ mensaje: "Venta no encontrada" }); // Si no se encuentra, devolver un mensaje de error
+    }
+});
+
 
 module.exports = rutas;

@@ -1,4 +1,4 @@
-const productosBD = require("./conexion").productos;
+const productosBD = require("./conexion").productos; 
 const Producto = require("../modelos/ProductoModelo");
 const { encriptarCodigo, validarCodigo } = require("../middlewares/funcionesCodigo");
 
@@ -8,7 +8,7 @@ function validarDatosProducto(producto) {
 
 async function mostrarProductos() {
     const productos = await productosBD.get();
-    productosValidos = [];
+    let productosValidos = [];
     productos.forEach(producto => {
         const producto1 = new Producto({ id: producto.id, ...producto.data() });
         if (validarDatosProducto(producto1.getProducto)) {
@@ -46,9 +46,28 @@ async function borrarProducto(id) {
     return false;
 }
 
+async function editarProducto(id, data) {
+    const productoExistente = await buscarProductoPorID(id); // Verifica si el producto existe
+    if (!productoExistente) {
+        return false; // Retorna falso si el producto no existe
+    }
+
+    // Actualizamos los datos permitidos
+    const productoActualizado = {
+        nombre: data.nombre || productoExistente.nombre,
+        proveedor: data.proveedor || productoExistente.proveedor,
+        codigo: data.codigo ? encriptarCodigo(data.codigo).hash : productoExistente.codigo,
+        salt: data.codigo ? encriptarCodigo(data.codigo).salt : productoExistente.salt
+    };
+
+    await productosBD.doc(id).update(productoActualizado); // Actualiza los datos en la BD
+    return { id, ...productoActualizado }; 
+}
+
 module.exports = {
     mostrarProductos,
     nuevoProducto,
     borrarProducto,
-    buscarProductoPorID
-}
+    buscarProductoPorID,
+    editarProducto,
+};

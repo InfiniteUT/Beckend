@@ -10,9 +10,9 @@ async function nuevaVenta(data) {
 async function buscarVentaPorId(id) {
     const venta = await ventasBD.doc(id).get(); // Buscar venta por ID
     if (venta.exists) {
-        return { id: venta.id, ...venta.data() }; // Devolver la venta si existe
+        return { id: venta.id, ...venta.data() }; 
     } else {
-        return null; // Si no existe, devolver null
+        return null; 
     }
 }
 
@@ -34,9 +34,30 @@ async function cambiarEstatusVenta(id, nuevoEstatus) {
     return false;
 }
 
+//EDITAR VENTAS
+async function editarVenta(id, data) {
+    const ventaExistente = await buscarVentaPorId(id); // Verifica si la venta existe
+    if (!ventaExistente) {
+        return false; 
+    }
+
+
+    const ventaActualizada = {
+        idUsuario: data.idUsuario || ventaExistente.idUsuario,
+        idProducto: data.idProducto || ventaExistente.idProducto,
+        fecha: data.fecha || ventaExistente.fecha,
+        hora: data.hora || ventaExistente.hora,
+        estatus: data.estatus || ventaExistente.estatus
+    };
+
+    await ventasBD.doc(id).update(ventaActualizada); 
+    return { id: id, ...ventaActualizada }; 
+}
+
 module.exports = {
     nuevaVenta,
     buscarVentaPorId,
     mostrarVentas,
-    cambiarEstatusVenta
+    cambiarEstatusVenta,
+    editarVenta
 };

@@ -1,5 +1,6 @@
-var rutas = require("express").Router();
-var { mostrarProductos, nuevoProducto, borrarProducto, buscarProductoPorID } = require("../bd/productosBD");
+const express = require("express");
+const rutas = express.Router();
+const { mostrarProductos, nuevoProducto, borrarProducto, buscarProductoPorID, editarProducto } = require("../bd/productosBD");
 
 rutas.get("/", async (req, res) => {
     const productosValidos = await mostrarProductos();
@@ -20,6 +21,12 @@ rutas.delete("/borrarProducto/:id", async (req, res) => {
 rutas.post("/nuevoProducto", async (req, res) => {
     const productoValido = await nuevoProducto(req.body);
     res.json(productoValido);
+});
+
+// Ruta para editar un producto
+rutas.put("/editarProducto/:id", async (req, res) => {
+    const productoActualizado = await editarProducto(req.params.id, req.body);
+    res.json(productoActualizado);
 });
 
 module.exports = rutas;

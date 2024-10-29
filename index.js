@@ -1,4 +1,5 @@
 const express = require("express");
+const cors=require("cors");
 const usuarioRutas = require("./rutas/rutasUsuarios");
 const productoRutas = require("./rutas/rutasProductos"); // Importar rutas de productos
 const ventaRutas = require("./rutas/rutasVentas");
@@ -7,6 +8,11 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:3001',  // Permitir peticiones desde el frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
 
 // Registrar rutas de usuarios
 app.use("/usuarios", usuarioRutas);
